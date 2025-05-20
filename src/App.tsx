@@ -7,7 +7,7 @@ const App = observer(() => {
     <div className="flex justify-center items-center h-screen w-full">
       <div className="text-center">
         <div className="flex flex-col gap-4">
-          <h1 className="text-2xl font-bold">MobX Timer!!!</h1>
+          <h1 className="text-amber-950">MobX Timer!!!</h1>
           <div className="text-lg">Seconds passed: {timerStore.secondsPassed}</div>
           <Button onClick={() => timerStore.reset()}>Reset</Button>
         </div>

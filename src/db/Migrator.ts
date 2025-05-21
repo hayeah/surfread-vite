@@ -1,5 +1,4 @@
-
-import { PGlite } from '@electric-sql/pglite'
+import { PGlite } from "@electric-sql/pglite"
 
 export interface Migration {
   name: string
@@ -30,7 +29,7 @@ export class Migrator {
     const result: { rows: { name: string }[] } = await this.db.query(`
       SELECT name FROM migrations;
     `)
-    const appliedMigrations = new Set(result.rows.map(row => row.name))
+    const appliedMigrations = new Set(result.rows.map((row) => row.name))
 
     // Apply each migration that hasn't been applied yet
     for (const migration of migrations) {
@@ -39,10 +38,7 @@ export class Migrator {
         await this.db.exec(migration.up)
 
         // Mark the migration as applied
-        await this.db.query(
-          `INSERT INTO migrations (name) VALUES ($1)`,
-          [migration.name]
-        )
+        await this.db.query(`INSERT INTO migrations (name) VALUES ($1)`, [migration.name])
       }
     }
   }

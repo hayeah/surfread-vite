@@ -1,10 +1,10 @@
-import React from "react";
+import React from "react"
 
 interface DrawerButtonProps {
-  onClick: () => void;
-  isOpen: boolean;
-  position: "left" | "right";
-  className?: string;
+  onClick: () => void
+  isOpen: boolean
+  position: "left" | "right"
+  className?: string
 }
 
 const DrawerButton: React.FC<DrawerButtonProps> = ({
@@ -13,20 +13,18 @@ const DrawerButton: React.FC<DrawerButtonProps> = ({
   position,
   className = "",
 }) => {
-  const isLeft = position === "left";
+  const isLeft = position === "left"
 
   return (
     <button
       onClick={onClick}
-      className={`p-2 hover:bg-gray-100 rounded ${
-        isLeft ? "rounded-r" : "rounded-l"
-      } ${className}`}
+      className={`rounded p-2 hover:bg-gray-100 ${isLeft ? "rounded-r" : "rounded-l"} ${className}`}
     >
       <span style={{ display: "inline-block" }}>
-        {isLeft ? (isOpen ? "←" : "→") : (isOpen ? "→" : "←")}
+        {isLeft ? (isOpen ? "←" : "→") : isOpen ? "→" : "←"}
       </span>
     </button>
-  );
-};
+  )
+}
 
-export default DrawerButton;
+export default DrawerButton

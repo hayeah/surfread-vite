@@ -57,7 +57,7 @@ export function prefixSearch(query: string, title: string): SearchResult {
   if (tokens.length === 0) {
     return {
       matched: false,
-      highlightInfo: []
+      highlightInfo: [],
     }
   }
 
@@ -81,7 +81,7 @@ export function prefixSearch(query: string, title: string): SearchResult {
         highlightInfo.push({
           wordIndex: wIndex,
           matchStart: leadingPuncCount,
-          matchLength: token.length
+          matchLength: token.length,
         })
         // Move to the next token. The next token search will continue from the next word.
         wIndex++
@@ -96,7 +96,7 @@ export function prefixSearch(query: string, title: string): SearchResult {
     if (!found) {
       return {
         matched: false,
-        highlightInfo: []
+        highlightInfo: [],
       }
     }
   }
@@ -104,6 +104,6 @@ export function prefixSearch(query: string, title: string): SearchResult {
   // All tokens matched in order.
   return {
     matched: true,
-    highlightInfo
+    highlightInfo,
   }
 }

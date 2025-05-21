@@ -1,4 +1,4 @@
-import React from "react";
+import React from "react"
 import {
   Command,
   CommandDialog,
@@ -9,31 +9,31 @@ import {
   CommandList,
   CommandSeparator,
   CommandShortcut,
-} from "@/components/ui/command";
-import { useCommandPaletteStore } from "@/store/commandPaletteStore";
+} from "@/components/ui/command"
+import { useCommandPaletteStore } from "@/store/commandPaletteStore"
 
 export interface CommandAction {
-  id: string;
-  title: string;
-  description?: string;
-  icon?: React.ReactNode;
-  shortcut?: string;
-  disabled?: boolean;
-  onSelect: () => void;
+  id: string
+  title: string
+  description?: string
+  icon?: React.ReactNode
+  shortcut?: string
+  disabled?: boolean
+  onSelect: () => void
 }
 
 export interface CommandSection {
-  name: string;
-  items: CommandAction[];
+  name: string
+  items: CommandAction[]
 }
 
 interface CommandPaletteProps {
-  sections: CommandSection[];
-  placeholder?: string;
+  sections: CommandSection[]
+  placeholder?: string
 }
 
 export function CommandPalette({ sections, placeholder }: CommandPaletteProps) {
-  const { isOpen, onClose } = useCommandPaletteStore();
+  const { isOpen, onClose } = useCommandPaletteStore()
 
   return (
     <CommandDialog open={isOpen} onOpenChange={onClose}>
@@ -50,16 +50,14 @@ export function CommandPalette({ sections, placeholder }: CommandPaletteProps) {
                     key={item.id}
                     disabled={item.disabled}
                     onSelect={() => {
-                      item.onSelect();
-                      onClose();
+                      item.onSelect()
+                      onClose()
                     }}
                     value={item.title}
                   >
                     {item.icon && <span className="mr-2">{item.icon}</span>}
                     <span>{item.title}</span>
-                    {item.shortcut && (
-                      <CommandShortcut>{item.shortcut}</CommandShortcut>
-                    )}
+                    {item.shortcut && <CommandShortcut>{item.shortcut}</CommandShortcut>}
                   </CommandItem>
                 ))}
               </CommandGroup>
@@ -68,5 +66,5 @@ export function CommandPalette({ sections, placeholder }: CommandPaletteProps) {
         </CommandList>
       </Command>
     </CommandDialog>
-  );
+  )
 }

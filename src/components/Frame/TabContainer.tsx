@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react"
 import {
   DndContext,
   closestCenter,
@@ -9,36 +9,36 @@ import {
   DragStartEvent,
   DragEndEvent,
   DragOverlay,
-} from "@dnd-kit/core";
+} from "@dnd-kit/core"
 import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   horizontalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { SortableTab } from "./SortableTab";
-import { ChatInput } from "./ChatInput";
+} from "@dnd-kit/sortable"
+import { SortableTab } from "./SortableTab"
+import { ChatInput } from "./ChatInput"
 
 interface Tab {
-  id: string;
-  label: string;
-  content: React.ReactNode;
+  id: string
+  label: string
+  content: React.ReactNode
 }
 
 interface TabContainerProps {
-  tabs: Tab[];
+  tabs: Tab[]
 }
 
 const TabContainer: React.FC<TabContainerProps> = ({ tabs: propTabs }) => {
-  const [tabs, setTabs] = useState<Tab[]>([]);
-  const [activeTab, setActiveTab] = useState<string>("");
-  const [isDragging, setIsDragging] = useState(false);
-  const [draggedItem, setDraggedItem] = useState(null);
+  const [tabs, setTabs] = useState<Tab[]>([])
+  const [activeTab, setActiveTab] = useState<string>("")
+  const [isDragging, setIsDragging] = useState(false)
+  const [draggedItem, setDraggedItem] = useState(null)
 
   useEffect(() => {
-    setTabs(propTabs);
-    setActiveTab(propTabs[0]?.id || "");
-  }, [propTabs]);
+    setTabs(propTabs)
+    setActiveTab(propTabs[0]?.id || "")
+  }, [propTabs])
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -49,108 +49,108 @@ const TabContainer: React.FC<TabContainerProps> = ({ tabs: propTabs }) => {
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
+    }),
+  )
 
   const handleDragStart = (event: DragStartEvent) => {
-    setIsDragging(true);
-    setDraggedItem(event.active.id);
-  };
+    setIsDragging(true)
+    setDraggedItem(event.active.id)
+  }
 
   const handleDragEnd = (event: DragEndEvent) => {
-    setIsDragging(false);
-    setDraggedItem(null);
-    const { active, over } = event;
+    setIsDragging(false)
+    setDraggedItem(null)
+    const { active, over } = event
 
     if (active.id !== over?.id) {
       setTabs((items) => {
-        const oldIndex = items.findIndex((item) => item.id === active.id);
-        const newIndex = items.findIndex((item) => item.id === over?.id);
+        const oldIndex = items.findIndex((item) => item.id === active.id)
+        const newIndex = items.findIndex((item) => item.id === over?.id)
 
-        return arrayMove(items, oldIndex, newIndex);
-      });
+        return arrayMove(items, oldIndex, newIndex)
+      })
     }
-  };
+  }
 
   const easeInOutCubic = (t: number): number => {
-    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-  };
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
+  }
 
   const smoothScrollTo = (container: HTMLElement, targetX: number, duration: number) => {
-    const startX = container.scrollLeft;
-    const distanceX = targetX - startX;
-    const startTime = performance.now();
+    const startX = container.scrollLeft
+    const distanceX = targetX - startX
+    const startTime = performance.now()
 
     const scrollStep = (currentTime: number) => {
-      const elapsedTime = currentTime - startTime;
-      const progress = Math.min(elapsedTime / duration, 1);
-      const ease = easeInOutCubic(progress);
+      const elapsedTime = currentTime - startTime
+      const progress = Math.min(elapsedTime / duration, 1)
+      const ease = easeInOutCubic(progress)
 
-      container.scrollLeft = startX + distanceX * ease;
+      container.scrollLeft = startX + distanceX * ease
 
       if (progress < 1) {
-        requestAnimationFrame(scrollStep);
+        requestAnimationFrame(scrollStep)
       }
-    };
+    }
 
-    requestAnimationFrame(scrollStep);
-  };
+    requestAnimationFrame(scrollStep)
+  }
 
   const handleTabClick = (tabId: string) => {
     if (!isDragging) {
-      setActiveTab(tabId);
+      setActiveTab(tabId)
 
-      const container = document.querySelector('.panel-container') as HTMLElement;
-      const panel = document.querySelector(`[data-tab-id="${tabId}"]`) as HTMLElement;
+      const container = document.querySelector(".panel-container") as HTMLElement
+      const panel = document.querySelector(`[data-tab-id="${tabId}"]`) as HTMLElement
 
       if (container && panel) {
-        const containerRect = container.getBoundingClientRect();
-        const panelRect = panel.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect()
+        const panelRect = panel.getBoundingClientRect()
 
         // Check if panel is fully visible
-        const panelLeftVisible = panelRect.left >= containerRect.left;
-        const panelRightVisible = panelRect.right <= containerRect.right;
-        const isFullyVisible = panelLeftVisible && panelRightVisible;
+        const panelLeftVisible = panelRect.left >= containerRect.left
+        const panelRightVisible = panelRect.right <= containerRect.right
+        const isFullyVisible = panelLeftVisible && panelRightVisible
 
         if (!isFullyVisible) {
-          let targetScroll = container.scrollLeft;
+          let targetScroll = container.scrollLeft
 
           // If right edge is hidden, scroll minimally to show it
           if (!panelRightVisible) {
-            const overflowRight = panelRect.right - containerRect.right;
-            targetScroll += overflowRight;
+            const overflowRight = panelRect.right - containerRect.right
+            targetScroll += overflowRight
           }
 
           // If left edge is hidden, scroll to show it
           if (!panelLeftVisible) {
-            const overflowLeft = containerRect.left - panelRect.left;
-            targetScroll -= overflowLeft;
+            const overflowLeft = containerRect.left - panelRect.left
+            targetScroll -= overflowLeft
           }
 
-          smoothScrollTo(container, targetScroll, 150);
+          smoothScrollTo(container, targetScroll, 150)
         }
       }
     }
-  };
+  }
 
   const handleCloseTab = (tabId: string) => {
-    const newTabs = tabs.filter(tab => tab.id !== tabId);
+    const newTabs = tabs.filter((tab) => tab.id !== tabId)
     if (newTabs.length === 0) {
-      return; // Don't close the last tab
+      return // Don't close the last tab
     }
 
     if (activeTab === tabId) {
       // If closing active tab, activate the next available tab
-      const index = tabs.findIndex(tab => tab.id === tabId);
-      const nextTab = tabs[index + 1] || tabs[index - 1];
-      setActiveTab(nextTab.id);
+      const index = tabs.findIndex((tab) => tab.id === tabId)
+      const nextTab = tabs[index + 1] || tabs[index - 1]
+      setActiveTab(nextTab.id)
     }
 
-    setTabs(newTabs);
-  };
+    setTabs(newTabs)
+  }
 
   return (
-    <div className="flex flex-col w-full h-full">
+    <div className="flex h-full w-full flex-col">
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
@@ -161,16 +161,16 @@ const TabContainer: React.FC<TabContainerProps> = ({ tabs: propTabs }) => {
           {draggedItem && (
             <SortableTab
               id={draggedItem}
-              label={tabs.find(tab => tab.id === draggedItem)!.label}
+              label={tabs.find((tab) => tab.id === draggedItem)!.label}
               isActive={false}
               onClick={() => handleTabClick(draggedItem)}
               onClose={() => handleCloseTab(draggedItem)}
             />
           )}
         </DragOverlay>
-        <div className="flex bg-gray-900 text-white overflow-x-auto">
+        <div className="flex overflow-x-auto bg-gray-900 text-white">
           <SortableContext
-            items={tabs.map(tab => tab.id)}
+            items={tabs.map((tab) => tab.id)}
             strategy={horizontalListSortingStrategy}
           >
             {tabs.map((tab) => (
@@ -186,22 +186,18 @@ const TabContainer: React.FC<TabContainerProps> = ({ tabs: propTabs }) => {
           </SortableContext>
         </div>
       </DndContext>
-      <div className="flex-1 relative">
-        <div className="absolute inset-0 overflow-x-auto panel-container">
+      <div className="relative flex-1">
+        <div className="panel-container absolute inset-0 overflow-x-auto">
           <div className="flex h-full min-w-min">
             {tabs.map((tab) => (
               <div
                 key={tab.id}
                 data-tab-id={tab.id}
-                className={`w-[400px] flex-shrink-0 px-4 h-full flex flex-col ${activeTab === tab.id
-                  ? 'border-2 border-blue-500/20'
-                  : 'border-r border-gray-200'
-                  }`}
+                className={`flex h-full w-[400px] flex-shrink-0 flex-col px-4 ${
+                  activeTab === tab.id ? "border-2 border-blue-500/20" : "border-r border-gray-200"
+                }`}
               >
-                <div
-                  className="flex-1 overflow-y-auto"
-                  onClick={() => handleTabClick(tab.id)}
-                >
+                <div className="flex-1 overflow-y-auto" onClick={() => handleTabClick(tab.id)}>
                   {tab.content}
                 </div>
               </div>
@@ -210,7 +206,7 @@ const TabContainer: React.FC<TabContainerProps> = ({ tabs: propTabs }) => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default TabContainer;
+export default TabContainer

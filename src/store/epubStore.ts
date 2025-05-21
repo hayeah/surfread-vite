@@ -1,6 +1,6 @@
 import { create } from "zustand"
 import { immer } from "zustand/middleware/immer"
-import ePub, { Book, NavItem } from "epubjs"
+import ePub, { Book, type NavItem } from "epubjs"
 import { EpubPgliteStore } from "./epubPgliteStore"
 
 let storePromise: Promise<EpubPgliteStore> | null = null

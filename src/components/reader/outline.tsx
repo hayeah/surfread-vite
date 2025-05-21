@@ -1,5 +1,5 @@
 import React from "react"
-import { FlatTOC } from "../../store/epubStore"
+import { type FlatTOC } from "../../store/epubStore"
 
 interface OutlineProps {
   toc: FlatTOC

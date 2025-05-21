@@ -17,7 +17,7 @@ export default function EpubPage() {
 
   useEffect(() => {
     const params = new URLSearchParams(loc.split("?")[1] || "")
-    const id = Number(params.get("book"))
+    const id = parseInt(params.get("book") ?? "")
     if (!isNaN(id)) loadBook(id)
   }, [loc, loadBook])
 

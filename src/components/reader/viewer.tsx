@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react"
-import { Book, Rendition, NavItem } from "epubjs"
+import { Book, Rendition } from "epubjs"
 import debounce from "lodash/debounce"
 import { useEpubStore } from "@/store/epubStore"
 import { getSelectionContext } from "./getSelectionContext"

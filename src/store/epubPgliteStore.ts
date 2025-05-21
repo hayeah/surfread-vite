@@ -1,3 +1,4 @@
+// import { PGlite } from "@electric-sql/pglite/dist/index.js"
 import { PGlite } from "@electric-sql/pglite"
 import { Migrator, type Migration } from "../db/Migrator"
 import { BlobStore } from "./blobStore"

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useRouter } from 'next/router';
+import { useLocation } from 'wouter';
 import { useEpubStore } from '@/store/epubStore';
 import { Dropzone } from '@/components/ui/dropzone';
 import { prefixSearch } from '@/utils/textSearch';
@@ -8,11 +8,10 @@ import { prefixSearch } from '@/utils/textSearch';
 export const EpubLibrary = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const { handleFileAccepted, availableBooks, loadBook, deleteBook } = useEpubStore();
-  const router = useRouter();
-  const { book: bookId } = router.query;
+  const [, navigate] = useLocation();
 
   const handleBookClick = (id: number) => {
-    router.push(`/epub?book=${id}`, undefined, { shallow: true });
+    navigate(`/epub?book=${id}`);
   };
 
   const handleDeleteClick = (e: React.MouseEvent, id: number) => {

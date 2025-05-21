@@ -51,7 +51,6 @@ ${selectedText.text}
 ${selectedText.context}
 `;
 
-            // createChatTab(prompt.trim());
             copyToClipboard(prompt.trim());
           },
         },
@@ -76,7 +75,6 @@ Distill the given text content in a more **engaging and readable style** (simila
 ${selectedText.text}
 `;
 
-            // createChatTab(prompt.trim());
             copyToClipboard(prompt.trim());
           },
         },

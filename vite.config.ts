@@ -5,7 +5,8 @@ import react from "@vitejs/plugin-react"
 import tailwindcss from "@tailwindcss/vite"
 
 export default defineConfig({
-  optimizeDeps: { exclude: ["@electric-sql/pglite"] }, // don’t pre-bundle
+  assetsInclude: ["**/*.wasm"],
+  optimizeDeps: { exclude: ["@electric-sql/pglite", "wa-sqlite"] },
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {

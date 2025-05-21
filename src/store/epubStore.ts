@@ -1,12 +1,12 @@
 import { create } from "zustand"
 import { immer } from "zustand/middleware/immer"
 import ePub, { Book, type NavItem } from "epubjs"
-import { EpubPgliteStore } from "./epubPgliteStore"
+import { EpubSQLiteStore } from "./epubSQLiteStore"
 
-let storePromise: Promise<EpubPgliteStore> | null = null
-async function getStore(): Promise<EpubPgliteStore> {
+let storePromise: Promise<EpubSQLiteStore> | null = null
+async function getStore(): Promise<EpubSQLiteStore> {
   if (!storePromise) {
-    storePromise = EpubPgliteStore.init("idb://my-pgdata")
+    storePromise = EpubSQLiteStore.init()
   }
   return storePromise
 }

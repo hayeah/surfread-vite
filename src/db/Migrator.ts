@@ -1,4 +1,7 @@
-import { PGlite } from "@electric-sql/pglite"
+export interface SQLLikeDB {
+  exec(sql: string): Promise<void>
+  query<R = any>(sql: string, params?: unknown[]): Promise<{ rows: R[] }>
+}
 
 export interface Migration {
   name: string
@@ -6,11 +9,7 @@ export interface Migration {
 }
 
 export class Migrator {
-  private db: PGlite
-
-  public constructor(db: PGlite) {
-    this.db = db
-  }
+  constructor(private db: SQLLikeDB) {}
 
   /**
    * Run all pending migrations.

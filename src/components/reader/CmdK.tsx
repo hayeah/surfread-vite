@@ -1,27 +1,26 @@
-import { useEffect } from 'react';
+import { useEffect } from "react"
 
-import { useCommandPaletteStore } from '@/store/commandPaletteStore';
-import { CommandPalette } from '@/components/CommandPalette/CommandPalette';
-import { useEpubStore } from '@/store/epubStore';
-import { copyToClipboard } from '@/utils/clipboard';
+import { useCommandPaletteStore } from "@/store/commandPaletteStore"
+import { CommandPalette } from "@/components/CommandPalette/CommandPalette"
+import { useEpubStore } from "@/store/epubStore"
+import { copyToClipboard } from "@/utils/clipboard"
 
 export function CmdK() {
-  const { reader } = useEpubStore();
-  const selectedText = reader?.selectedText;
-  const { onOpen } = useCommandPaletteStore();
+  const { reader } = useEpubStore()
+  const selectedText = reader?.selectedText
+  const { onOpen } = useCommandPaletteStore()
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault();
-        onOpen();
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault()
+        onOpen()
       }
-    };
+    }
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onOpen]);
-
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [onOpen])
 
   const commandSections = [
     {
@@ -32,7 +31,7 @@ export function CmdK() {
           title: "Explain",
           description: "Get an explanation of the selected text",
           onSelect: () => {
-            if (!selectedText?.text) return;
+            if (!selectedText?.text) return
             const prompt = `
 You are a reading companion that enriches and clarifies questions a reader would have about this book.
 
@@ -49,10 +48,9 @@ ${selectedText.text}
 --- Context ---
 
 ${selectedText.context}
-`;
+`
 
-            // createChatTab(prompt.trim());
-            copyToClipboard(prompt.trim());
+            copyToClipboard(prompt.trim())
           },
         },
         {
@@ -60,7 +58,7 @@ ${selectedText.context}
           title: "Distill",
           description: "Distill the content into listicle",
           onSelect: () => {
-            if (!selectedText?.text) return;
+            if (!selectedText?.text) return
 
             const prompt = `
 Distill the given text content in a more **engaging and readable style** (similar to ChatGPT LISTICLE responses).
@@ -74,21 +72,14 @@ Distill the given text content in a more **engaging and readable style** (simila
 ------
 
 ${selectedText.text}
-`;
+`
 
-            // createChatTab(prompt.trim());
-            copyToClipboard(prompt.trim());
+            copyToClipboard(prompt.trim())
           },
         },
       ],
     },
-  ];
+  ]
 
-  return (
-    <CommandPalette
-      sections={commandSections}
-      placeholder="Search actions..."
-    />
-  );
-
+  return <CommandPalette sections={commandSections} placeholder="Search actions..." />
 }

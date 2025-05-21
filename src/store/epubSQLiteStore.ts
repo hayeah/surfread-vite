@@ -1,6 +1,67 @@
-import initSqlite, { open, IDBBatchAtomicVFS } from "wa-sqlite"
+import SQLiteESMFactory from "wa-sqlite/dist/wa-sqlite-async.mjs"
+import { IDBBatchAtomicVFS } from "wa-sqlite/src/examples/IDBBatchAtomicVFS.js"
+import * as SQLite from "wa-sqlite"
+
+// const SQLITE_ASSETS_DIR = new URL(
+//   "./node_modules/wa-sqlite/dist/", // note the leading "./"
+//   import.meta.url,
+// ).href
+
 import { Migrator, type Migration, type SQLLikeDB } from "../db/Migrator"
 import { BlobStore } from "./blobStore"
+
+export class SQLiteDBWrapper implements SQLLikeDB {
+  constructor(
+    private readonly sqlite3: ReturnType<typeof SQLite.Factory>,
+    private readonly db: number,
+  ) {}
+
+  private static toPositional(sql: string): string {
+    // convert $1, $2 … → ? so we can use array-binding
+    return sql.replace(/\$\d+/g, "?")
+  }
+
+  async exec(sql: string): Promise<void> {
+    await this.sqlite3.exec(this.db, SQLiteDBWrapper.toPositional(sql))
+  }
+
+  async query<R = any>(sql: string, params: unknown[] = []): Promise<{ rows: R[] }> {
+    const rows: R[] = []
+    const positional = SQLiteDBWrapper.toPositional(sql)
+
+    for await (const stmt of this.sqlite3.statements(this.db, positional)) {
+      if (params.length) {
+        // bind_collection accepts either an array (for ? placeholders)
+        // or an object (for named placeholders)
+        this.sqlite3.bind_collection(stmt, params as any)
+      }
+
+      while ((await this.sqlite3.step(stmt)) === SQLite.SQLITE_ROW) {
+        const colCount = this.sqlite3.column_count(stmt)
+        const row: Record<string, unknown> = {}
+
+        for (let i = 0; i < colCount; i++) {
+          const name = this.sqlite3.column_name(stmt, i)
+          row[name] = this.sqlite3.column(stmt, i)
+        }
+        rows.push(row as R)
+      }
+    }
+    return { rows }
+  }
+
+  async transaction<T>(fn: (tx: SQLiteDBWrapper) => Promise<T>): Promise<T> {
+    await this.exec("BEGIN")
+    try {
+      const result = await fn(this)
+      await this.exec("COMMIT")
+      return result
+    } catch (err) {
+      await this.exec("ROLLBACK")
+      throw err
+    }
+  }
+}
 
 /**
  * Migration definitions for the epub database schema.
@@ -10,29 +71,33 @@ const MIGRATIONS: Migration[] = [
   {
     name: "001_create_books_table",
     up: `
-      CREATE TABLE IF NOT EXISTS books (
-        id SERIAL PRIMARY KEY,
-        title TEXT NOT NULL,
-        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-      );
+CREATE TABLE IF NOT EXISTS books (
+  id         INTEGER PRIMARY KEY,             -- add AUTOINCREMENT only if you truly need gap-free ids
+  title      TEXT    NOT NULL,
+  created_at TEXT    NOT NULL DEFAULT (datetime('now')),
+  updated_at TEXT    NOT NULL DEFAULT (datetime('now'))
+);
     `,
   },
   {
     name: "002_create_reading_progress_table",
     up: `
-      CREATE TABLE IF NOT EXISTS reading_progress (
-        id SERIAL PRIMARY KEY,
-        book_id INT NOT NULL REFERENCES books(id),
-        session_key TEXT NOT NULL DEFAULT '',
-        location TEXT,
-        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        UNIQUE (book_id, session_key)
-      );
+-- reading_progress table
+CREATE TABLE IF NOT EXISTS reading_progress (
+  id            INTEGER PRIMARY KEY,                 -- implicit auto-increment via rowid
+  book_id       INTEGER  NOT NULL,
+  session_key   TEXT     NOT NULL DEFAULT '',
+  location      TEXT,
+  created_at    TEXT     NOT NULL DEFAULT (datetime('now')),
+  updated_at    TEXT     NOT NULL DEFAULT (datetime('now')),
+  UNIQUE (book_id, session_key),
+  FOREIGN KEY (book_id) REFERENCES books(id)         -- enable with PRAGMA foreign_keys = ON
+);
     `,
   },
 ]
+
+import wasmUrl from "wa-sqlite/dist/wa-sqlite-async.wasm?url"
 
 /**
  * Store for managing epub books and reading progress using wa-sqlite.
@@ -45,10 +110,24 @@ export class EpubSQLiteStore {
   static async init(): Promise<EpubSQLiteStore> {
     if (this.instance) return this.instance
 
-    const sqlite = await initSqlite()
-    const vfsName = "idb-batch"
-    sqlite.registerVfs(new IDBBatchAtomicVFS(vfsName))
-    const db = await open({ filename: "idb://epub.db", vfs: vfsName, flags: "c" })
+    // const module = await WebAssembly.instantiateStreaming(fetch(wasmUrl), imports)
+
+    const module = await SQLiteESMFactory({
+      locateFile: (f) => wasmUrl,
+    })
+
+    // create the high-level API wrapper
+    const sqlite3 = SQLite.Factory(module)
+
+    // build and register the IndexedDB-backed VFS
+    const vfs = await IDBBatchAtomicVFS.create("epub-store", module, {
+      // lockPolicy: "shared+hint",
+    })
+    sqlite3.vfs_register(vfs, true) // true ⇒ make it the default FS
+
+    // open (or create) the database via the convenience helper
+    const dbHandle = await sqlite3.open_v2("epub.db")
+    const db = new SQLiteDBWrapper(sqlite3, dbHandle)
 
     const store = new EpubSQLiteStore(db)
     const migrator = new Migrator(db)

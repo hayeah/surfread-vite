@@ -11,6 +11,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      // "wa-sqlite/dist": path.resolve(__dirname, "./node_modules/wa-sqlite/dist"),
     },
   },
 })

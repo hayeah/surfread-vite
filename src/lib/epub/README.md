@@ -14,24 +14,24 @@ A TypeScript library for parsing EPUB files. It provides a simple API to extract
 
 ```typescript
 // Load an EPUB file
-const parser = await EPubParser.load('path/to/book.epub');
+const parser = await EPubParser.load("path/to/book.epub")
 
 // Get metadata
-const metadata = await parser.metadata();
-console.log(metadata.title); // Book title
-console.log(metadata.author); // Book author
+const metadata = await parser.metadata()
+console.log(metadata.title) // Book title
+console.log(metadata.author) // Book author
 
 // Get table of contents
-const toc = await parser.toc();
-console.log(toc); // Array of chapters with titles and hrefs
+const toc = await parser.toc()
+console.log(toc) // Array of chapters with titles and hrefs
 
 // Get all chapters
-const chapters = await parser.chapters();
-console.log(chapters); // Array of chapters with content
+const chapters = await parser.chapters()
+console.log(chapters) // Array of chapters with content
 
 // Get everything at once
-const epubData = await parser.parse();
-console.log(epubData); // All EPUB data including metadata, toc, chapters
+const epubData = await parser.parse()
+console.log(epubData) // All EPUB data including metadata, toc, chapters
 ```
 
 ## Development
@@ -55,6 +55,7 @@ env GEN_FIXTURE=true bun test EPubParser.test.ts
 ```
 
 The following fixtures are used:
+
 - `alice-manifest.json`: EPUB manifest data
 - `alice-spine.json`: Reading order information
 - `alice-toc.json`: Table of contents structure

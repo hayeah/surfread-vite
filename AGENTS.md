@@ -1,0 +1,1 @@
+- if you ever need to install a dependency, you have no internet, just modify package.json manually, and i'll review it later.

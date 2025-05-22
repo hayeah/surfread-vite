@@ -89,5 +89,4 @@ describe("EpubSQLiteStore", () => {
     const progress = await store.getReadingProgress(id)
     expect(progress).toBe(location2)
   })
-
 })

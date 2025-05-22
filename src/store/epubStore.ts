@@ -213,7 +213,7 @@ export const useEpubStore = create<EpubStore>()(
         }
         set((state) => {
           state.reader = null
-          state.availableBooks = []
+          // state.availableBooks = []
         })
       },
 

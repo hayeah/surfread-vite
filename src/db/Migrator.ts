@@ -1,6 +1,6 @@
 export interface SQLLikeDB {
   exec(sql: string): Promise<void>
-  query<R = any>(sql: string, params?: unknown[]): Promise<{ rows: R[] }>
+  query<R = unknown>(sql: string, params?: unknown[]): Promise<{ rows: R[] }>
 }
 
 export interface Migration {

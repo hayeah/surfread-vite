@@ -46,6 +46,16 @@ export interface EPubChapter {
   content: string
 }
 
+interface ContainerXml {
+  container?: {
+    rootfiles?: {
+      rootfile?: {
+        "full-path"?: string
+      }
+    }
+  }
+}
+
 export class EPubParser {
   private zip: JSZip
   private xmlParser: XMLParser
@@ -87,7 +97,7 @@ export class EPubParser {
     }
   }
 
-  private async getContainerXml(): Promise<any> {
+  private async getContainerXml(): Promise<ContainerXml> {
     const containerFile = this.zip.file("META-INF/container.xml")
     if (!containerFile) {
       throw new Error("Invalid epub: missing container.xml")
@@ -131,7 +141,7 @@ export class EPubParser {
     }
 
     // Helper function to handle both single values and arrays
-    const getValue = (field: any): string[] => {
+    const getValue = (field: unknown): string[] => {
       if (!field) return []
       if (Array.isArray(field)) {
         return field.map((item) => (typeof item === "object" ? item["#text"] || "" : String(item)))
@@ -170,7 +180,7 @@ export class EPubParser {
 
     const items = Array.isArray(manifest.item) ? manifest.item : [manifest.item]
 
-    return items.map((item: any) => ({
+    return items.map((item: Record<string, unknown>) => ({
       id: item["id"],
       href: item["href"],
       mediaType: item["media-type"],
@@ -196,7 +206,7 @@ export class EPubParser {
 
     const items = Array.isArray(spine.itemref) ? spine.itemref : [spine.itemref]
 
-    return items.map((item: any) => ({
+    return items.map((item: Record<string, unknown>) => ({
       idref: item.idref,
       linear: item.linear !== "no",
     }))
@@ -222,9 +232,14 @@ export class EPubParser {
       throw new Error("Invalid epub: nav document does not contain a valid table of contents")
     }
 
-    const parseNavItems = (items: any[]): EPubTocItem[] => {
-      return items.map((item: any) => {
-        const a = item.a
+    interface RawNavItem {
+      a?: { ["#text"]?: string; href?: string }
+      ol?: { li: RawNavItem | RawNavItem[] }
+    }
+
+    const parseNavItems = (items: RawNavItem[]): EPubTocItem[] => {
+      return items.map((item: RawNavItem) => {
+        const a = item.a || {}
         return {
           label: a["#text"] || "",
           href: a.href || "",
@@ -255,8 +270,14 @@ export class EPubParser {
       throw new Error("Invalid epub: missing navigation points")
     }
 
-    const parseNavPoints = (items: any[]): EPubTocItem[] => {
-      return items.map((item: any) => {
+    interface RawNavPoint {
+      navLabel?: { text?: string }
+      content?: { src?: string }
+      navPoint?: RawNavPoint | RawNavPoint[]
+    }
+
+    const parseNavPoints = (items: RawNavPoint[]): EPubTocItem[] => {
+      return items.map((item: RawNavPoint) => {
         const content = item.content || {}
         const href = content.src || ""
         return {

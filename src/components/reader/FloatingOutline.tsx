@@ -8,7 +8,7 @@ interface FloatingOutlineProps {
 }
 
 export const FloatingOutline: React.FC<FloatingOutlineProps> = ({ isOpen, onClose }) => {
-  const { reader, setCurrentLocation, closeBook } = useEpubStore()
+  const { reader, setCurrentLocation } = useEpubStore()
 
   if (!isOpen) return null
 

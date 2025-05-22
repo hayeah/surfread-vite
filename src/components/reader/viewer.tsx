@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react"
 import { Book, Rendition } from "epubjs"
+import type { Location, Contents } from "epubjs"
 import debounce from "lodash/debounce"
 import { useEpubStore } from "@/store/epubStore"
 import { getSelectionContext } from "./getSelectionContext"
@@ -10,16 +11,10 @@ interface ViewerProps {
 }
 
 export function Viewer({ book, currentLocation }: ViewerProps) {
-  const {
-    setCurrentLocation,
-    setSelectedText,
-    saveProgress,
-    goToNextNavItem,
-    goToPreviousNavItem,
-  } = useEpubStore()
+  const { setSelectedText, saveProgress, goToNextNavItem, goToPreviousNavItem } = useEpubStore()
   const viewerRef = useRef<HTMLDivElement>(null)
   const renditionRef = useRef<Rendition | null>(null)
-  const displayPromiseRef = useRef<Promise<any> | null>(null)
+  const displayPromiseRef = useRef<Promise<void> | null>(null)
 
   useEffect(() => {
     if (viewerRef.current && book) {
@@ -86,14 +81,14 @@ export function Viewer({ book, currentLocation }: ViewerProps) {
       const debounceSaveProgress = debounce(saveProgress, 300)
 
       // Save location to db without updating current location in store
-      renditionRef.current.on("locationChanged", (location: any) => {
+      renditionRef.current.on("locationChanged", (location: Location) => {
         debounceSaveProgress(location.start)
       })
 
       // Add selection event handler
       const debounceSelectText = debounce(setSelectedText, 300)
 
-      renditionRef.current.on("selected", (cfiRange: string, contents: any) => {
+      renditionRef.current.on("selected", (cfiRange: string, contents: Contents) => {
         const selection = contents.window.getSelection()
         if (!selection || selection.rangeCount === 0) return
 
@@ -113,7 +108,7 @@ export function Viewer({ book, currentLocation }: ViewerProps) {
         }
       }
     }
-  }, [book])
+  }, [book, saveProgress, setSelectedText])
 
   useEffect(() => {
     if (currentLocation && renditionRef.current) {

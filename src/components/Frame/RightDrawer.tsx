@@ -1,6 +1,5 @@
 import React from "react"
 import DrawerButton from "./DrawerButton"
-import { useEpubStore } from "@/store/epubStore"
 
 interface RightDrawerProps {
   isOpen: boolean

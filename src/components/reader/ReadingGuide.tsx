@@ -5,7 +5,7 @@ export const ReadingGuide = () => {
   const [isDragging, setIsDragging] = useState(false)
   const guideRef = useRef<HTMLDivElement>(null)
 
-  const handleMouseDown = (e: React.MouseEvent) => {
+  const handleMouseDown = () => {
     setIsDragging(true)
   }
 

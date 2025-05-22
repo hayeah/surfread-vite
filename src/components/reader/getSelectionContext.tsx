@@ -100,6 +100,7 @@ export function getSelectionContext(selection: Selection, wordLimit: number = 20
  *   2) Else if it has a nextSibling, move to that.
  *   3) Else climb back up (parentNode) until we find a next sibling or run out of parents.
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getNextTextNode(startNode: Node, _offset: number): [Node | null, number] {
   let current: Node | null = startNode
 
@@ -146,6 +147,7 @@ function getNextTextNode(startNode: Node, _offset: number): [Node | null, number
  *   2) Otherwise climb up to current.parentNode.
  *   3) If no parent, you're at the top - stop.
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function getPreviousTextNode(startNode: Node, _offset: number): [Node | null, number] {
   let current: Node | null = startNode
 

@@ -25,7 +25,10 @@ export class SQLiteDBWrapper implements SQLLikeDB {
     await this.sqlite3.exec(this.db, SQLiteDBWrapper.toPositional(sql))
   }
 
-  async query<R = any>(sql: string, params: unknown[] = []): Promise<{ rows: R[] }> {
+  async query<R = Record<string, unknown>>(
+    sql: string,
+    params: unknown[] = [],
+  ): Promise<{ rows: R[] }> {
     const rows: R[] = []
     const positional = SQLiteDBWrapper.toPositional(sql)
 
@@ -33,7 +36,7 @@ export class SQLiteDBWrapper implements SQLLikeDB {
       if (params.length) {
         // bind_collection accepts either an array (for ? placeholders)
         // or an object (for named placeholders)
-        this.sqlite3.bind_collection(stmt, params as any)
+        this.sqlite3.bind_collection(stmt, params as unknown[])
       }
 
       while ((await this.sqlite3.step(stmt)) === SQLite.SQLITE_ROW) {
@@ -105,7 +108,11 @@ import wasmUrl from "wa-sqlite/dist/wa-sqlite-async.wasm?url"
  */
 export class EpubSQLiteStore {
   private static instance: EpubSQLiteStore | null = null
-  private constructor(private db: SQLLikeDB & { transaction: any }) {}
+  private constructor(
+    private db: SQLLikeDB & {
+      transaction<T>(fn: (tx: SQLLikeDB) => Promise<T>): Promise<T>
+    },
+  ) {}
 
   static async init(): Promise<EpubSQLiteStore> {
     if (this.instance) return this.instance
@@ -113,7 +120,7 @@ export class EpubSQLiteStore {
     // const module = await WebAssembly.instantiateStreaming(fetch(wasmUrl), imports)
 
     const module = await SQLiteESMFactory({
-      locateFile: (f) => wasmUrl,
+      locateFile: () => wasmUrl,
     })
 
     // create the high-level API wrapper

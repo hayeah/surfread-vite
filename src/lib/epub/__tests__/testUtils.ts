@@ -1,6 +1,6 @@
 import fs from "fs"
 import path from "path"
-import { expect, beforeEach, afterEach } from "vitest"
+import { expect } from "vitest"
 
 export function compareOrUpdateFixture<T>(fixturePath: string, actual: T): void {
   const GEN_FIXTURE = process.env.GEN_FIXTURE === "true"

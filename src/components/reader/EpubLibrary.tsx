@@ -6,7 +6,7 @@ import { prefixSearch } from "@/utils/textSearch"
 
 export const EpubLibrary = () => {
   const [searchQuery, setSearchQuery] = useState("")
-  const { handleFileAccepted, availableBooks, loadBook, deleteBook } = useEpubStore()
+  const { handleFileAccepted, availableBooks, deleteBook } = useEpubStore()
   const [, navigate] = useLocation()
 
   const handleBookClick = (id: number) => {

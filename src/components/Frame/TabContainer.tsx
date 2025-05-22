@@ -17,7 +17,6 @@ import {
   horizontalListSortingStrategy,
 } from "@dnd-kit/sortable"
 import { SortableTab } from "./SortableTab"
-import { ChatInput } from "./ChatInput"
 
 interface Tab {
   id: string

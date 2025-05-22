@@ -10,7 +10,7 @@ export const EpubLibrary = () => {
   const [, navigate] = useLocation()
 
   const handleBookClick = (id: number) => {
-    navigate(`/?book=${id}`)
+    navigate(`/book/${id}`)
   }
 
   const handleDeleteClick = (e: React.MouseEvent, id: number) => {

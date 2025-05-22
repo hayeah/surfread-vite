@@ -33,7 +33,7 @@
     "react-dom": "^19.1.0",
     "react-dropzone": "^14.3.8",
     "tailwind-merge": "^3.3.0",
-    "wa-sqlite": "^1.0.0",
+    "wa-sqlite": "https://github.com/rhashimoto/wa-sqlite",
     "wouter": "^3.7.0",
     "zustand": "^5.0.4"
   },

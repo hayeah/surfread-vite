@@ -17,7 +17,11 @@ export default function EpubPage() {
 
   useEffect(() => {
     const id = parseInt(params.get("book") ?? "")
-    if (!isNaN(id)) loadBook(id)
+    if (!isNaN(id)) {
+      loadBook(id)
+    } else {
+      closeBook()
+    }
   }, [params, loadBook])
 
   useEffect(() => {
@@ -28,7 +32,7 @@ export default function EpubPage() {
     {
       id: "reader",
       label: "Reader",
-      content: book ? <EpubReader /> : <EpubLibrary />,
+      content: "hoho",
     },
   ]
 

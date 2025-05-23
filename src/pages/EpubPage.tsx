@@ -1,7 +1,7 @@
 import { useEffect } from "react"
 import AppFrame from "../components/Frame/AppFrame"
 import { useEpubStore } from "@/store/epubStore"
-import { useSearchParams } from "wouter"
+import { useParams } from "wouter"
 
 import { EpubLibrary } from "@/components/reader/EpubLibrary"
 import { EpubReader } from "@/components/reader/EpubReader"
@@ -9,20 +9,20 @@ import { CmdK } from "@/components/reader/CmdK"
 
 export default function EpubPage() {
   const { reader: book, loadBook, refreshAvailableBooks, closeBook } = useEpubStore()
-  const [params] = useSearchParams()
+  const { id } = useParams<{ id: string }>()
 
   useEffect(() => {
     document.title = "EPUB Reader"
   }, [])
 
   useEffect(() => {
-    const id = parseInt(params.get("book") ?? "")
-    if (!isNaN(id)) {
-      loadBook(id)
+    const bookId = Number(id)
+    if (!isNaN(bookId)) {
+      loadBook(bookId)
     } else {
       closeBook()
     }
-  }, [params, loadBook])
+  }, [id, loadBook, closeBook])
 
   useEffect(() => {
     refreshAvailableBooks()
